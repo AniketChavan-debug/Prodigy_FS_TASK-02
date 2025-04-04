@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Records</title>
+</head>
+<body>
+    <h1>Employee Records</h1>
+    <form id="employeeForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="position" placeholder="Position" required>
+        <input type="text" id="department" placeholder="Department" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Add Employee</button>
+    </form>
+    <ul id="employeeList"></ul>
+
+    <script>
+        const form = document.getElementById('employeeForm');
+        const employeeList = document.getElementById('employeeList');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const position = document.getElementById('position').value;
+            const department = document.getElementById('department').value;
+            const email = document.getElementById('email').value;
+
+            const response = await fetch('http://localhost:5000/api/employees', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, position, department, email })
+            });
+
+            const newEmployee = await response.json();
+            addEmployeeToList(newEmployee);
+            form.reset();
+        });
+
+        async function fetchEmployees() {
+            const response = await fetch('http://localhost:5000/api/employees');
+            const employees = await response.json();
+            employees.forEach(addEmployeeToList);
+        }
+
+        function addEmployeeToList(employee) {
+            const li = document.createElement('li');
+            li.textContent = `${employee.name} - ${employee.position} - ${employee.department} - ${employee.email}`;
+            employeeList.appendChild(li);
+        }
+
+        fetchEmployees();
+    </script>
+</body>
+</html>
